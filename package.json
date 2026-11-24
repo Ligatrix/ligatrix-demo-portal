@@ -1,0 +1,25 @@
+{
+  "name": "@ligatrix/demo-portal",
+  "version": "1.0.0",
+  "description": "A working operations portal for request intake, approvals and handover, with zero runtime dependencies.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test",
+    "lint": "node scripts/lint.mjs",
+    "bundle": "node scripts/bundle.mjs",
+    "check-store": "node scripts/check-store.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ligatrix/ligatrix-demo-portal.git"
+  },
+  "homepage": "https://github.com/Ligatrix/ligatrix-demo-portal#readme",
+  "bugs": {
+    "url": "https://github.com/Ligatrix/ligatrix-demo-portal/issues"
+  }
+}
