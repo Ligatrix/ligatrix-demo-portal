@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Operations portal · Corvane Supply Co. (demo)</title>
+  <meta name="description" content="Request intake, approvals, activity log and handover export for Corvane Supply Co., a fictional distributor used in this demo.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="src/ui/styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7"/><path d="M9 21.5 16 9l7 12.5H9Z"/></svg>
+      <div>
+        <p class="brand-name">Corvane Supply Co.</p>
+        <p class="brand-note">Operations portal · a fictional distributor used in this demo</p>
+      </div>
+    </div>
+    <div class="topbar-tools">
+      <label class="actor">
+        <span>Acting as</span>
+        <select id="actor-select"></select>
+      </label>
+      <button type="button" class="button button-secondary" id="export-button">Handover export</button>
+    </div>
+  </header>
+
+  <nav class="tabs" aria-label="Sections">
+    <a href="#/dashboard" data-route="dashboard">Dashboard</a>
+    <a href="#/requests" data-route="requests">Requests</a>
+    <a href="#/new" data-route="new">New request</a>
+    <a href="#/activity" data-route="activity">Activity</a>
+  </nav>
+
+  <main id="main" tabindex="-1">
+    <p class="loading">Loading the portal…</p>
+    <noscript><p class="loading">This portal needs JavaScript enabled.</p></noscript>
+  </main>
+
+  <footer class="footer">
+    <p><span id="store-label">Connecting…</span></p>
+    <p><button type="button" class="link-button" id="reset-button">Reset demo data</button></p>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="src/ui/boot.js"></script>
+</body>
+</html>
