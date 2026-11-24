@@ -6,6 +6,10 @@ A working operations portal for request intake, approvals and handover, built wi
 
 The demo runs for **Corvane Supply Co., a fictional distributor used in this demo**. Every supplier, system and first name in it is invented.
 
+![The dashboard: open requests, time to approval, approval rate, approved spend, requests by state and what needs attention](docs/images/dashboard.png)
+
+![The request list with search, filters by state and type, and status badges](docs/images/requests.png)
+
 ## Why
 
 Most companies run purchase approvals, supplier onboarding and access requests through email threads and a shared spreadsheet. Nobody can say what is waiting on whom, approvals happen in reply-all, and when someone asks "who signed this off, and when?" the answer is a search through inboxes.
