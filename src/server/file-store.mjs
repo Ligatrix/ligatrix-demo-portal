@@ -5,7 +5,7 @@
 
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
-import { validateStore } from '../domain/export.mjs';
+import { storeFromBundle } from '../domain/export.mjs';
 
 export class FileStore {
   #file;
@@ -43,11 +43,12 @@ export class FileStore {
     } catch (error) {
       throw new Error(`${this.#file} is not valid JSON (${error.message}). Restore it from a backup; see docs/runbook.md.`);
     }
-    const check = validateStore(data);
-    if (!check.ok) {
-      throw new Error(`${this.#file} failed its integrity check: ${check.errors[0]} See docs/runbook.md.`);
+    try {
+      // Accepts a store or a handover bundle, keeping only the stored shape.
+      this.#store = storeFromBundle(data);
+    } catch (error) {
+      throw new Error(`${this.#file} failed its integrity check: ${error.errors?.[0] ?? error.message} See docs/runbook.md.`);
     }
-    this.#store = data;
     return { created: false };
   }
 

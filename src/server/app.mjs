@@ -117,7 +117,7 @@ export function createPortalServer({ store, root, seed, clock = () => new Date()
     const method = req.method;
 
     if (method === 'GET' && parts[0] === 'health' && parts.length === 1) {
-      return sendJson(res, 200, { ok: true, schemaVersion: SCHEMA_VERSION, requests: store.get().requests.length });
+      return sendJson(res, 200, { ok: true, schemaVersion: SCHEMA_VERSION, requests: store.get().requests.length, allowReset });
     }
     if (method === 'GET' && parts[0] === 'store' && parts.length === 1) {
       const { requests, log } = store.get();

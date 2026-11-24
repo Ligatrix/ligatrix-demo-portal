@@ -583,10 +583,14 @@ async function exportHandover() {
 
 async function resetData() {
   if (!window.confirm('Reset the demo data? Every change made here is replaced by the original demo requests.')) return;
-  await app.store.reset();
-  await refresh();
-  rerender();
-  toast('Demo data restored.');
+  try {
+    await app.store.reset();
+    await refresh();
+    rerender();
+    toast('Demo data restored.');
+  } catch (failure) {
+    toast(`Reset failed: ${errorMessage(failure)}`);
+  }
 }
 
 async function start() {
@@ -605,6 +609,7 @@ async function start() {
   try {
     app.store = await connectStore();
     ui.storeLabel.textContent = app.store.description;
+    ui.resetButton.hidden = !app.store.allowReset;
     await refresh();
     render();
   } catch (failure) {

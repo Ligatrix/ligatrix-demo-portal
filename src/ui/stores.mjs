@@ -20,6 +20,7 @@ const now = () => new Date().toISOString();
 export class MemoryStore {
   constructor() {
     this.mode = 'local';
+    this.allowReset = true;
     this.description = 'Local demo mode: changes live in this tab and reset on reload.';
     this.state = buildSeedStore();
   }
@@ -50,8 +51,9 @@ export class MemoryStore {
 }
 
 export class HttpStore {
-  constructor(base = '/api') {
+  constructor(base = '/api', { allowReset = true } = {}) {
     this.base = base;
+    this.allowReset = allowReset;
     this.mode = 'server';
     this.description = 'Connected to the portal server: changes are saved to its JSON store.';
   }
@@ -102,7 +104,8 @@ export async function connectStore() {
   if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
     try {
       const response = await fetch('/api/health', { headers: { Accept: 'application/json' } });
-      if (response.ok && (await response.json()).ok === true) return new HttpStore();
+      const health = response.ok ? await response.json() : null;
+      if (health?.ok === true) return new HttpStore('/api', { allowReset: health.allowReset !== false });
     } catch {
       // No API here (for example a plain static file server): use memory.
     }

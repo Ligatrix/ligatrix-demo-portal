@@ -1012,6 +1012,7 @@ const now = () => new Date().toISOString();
 class MemoryStore {
   constructor() {
     this.mode = 'local';
+    this.allowReset = true;
     this.description = 'Local demo mode: changes live in this tab and reset on reload.';
     this.state = buildSeedStore();
   }
@@ -1042,8 +1043,9 @@ class MemoryStore {
 }
 
 class HttpStore {
-  constructor(base = '/api') {
+  constructor(base = '/api', { allowReset = true } = {}) {
     this.base = base;
+    this.allowReset = allowReset;
     this.mode = 'server';
     this.description = 'Connected to the portal server: changes are saved to its JSON store.';
   }
@@ -1094,7 +1096,8 @@ async function connectStore() {
   if (window.location.protocol === 'http:' || window.location.protocol === 'https:') {
     try {
       const response = await fetch('/api/health', { headers: { Accept: 'application/json' } });
-      if (response.ok && (await response.json()).ok === true) return new HttpStore();
+      const health = response.ok ? await response.json() : null;
+      if (health?.ok === true) return new HttpStore('/api', { allowReset: health.allowReset !== false });
     } catch {
       // No API here (for example a plain static file server): use memory.
     }
@@ -1804,10 +1807,14 @@ async function exportHandover() {
 
 async function resetData() {
   if (!window.confirm('Reset the demo data? Every change made here is replaced by the original demo requests.')) return;
-  await app.store.reset();
-  await refresh();
-  rerender();
-  toast('Demo data restored.');
+  try {
+    await app.store.reset();
+    await refresh();
+    rerender();
+    toast('Demo data restored.');
+  } catch (failure) {
+    toast(`Reset failed: ${errorMessage(failure)}`);
+  }
 }
 
 async function start() {
@@ -1826,6 +1833,7 @@ async function start() {
   try {
     app.store = await connectStore();
     ui.storeLabel.textContent = app.store.description;
+    ui.resetButton.hidden = !app.store.allowReset;
     await refresh();
     render();
   } catch (failure) {

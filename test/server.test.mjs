@@ -38,7 +38,7 @@ const post = (path, body, headers = { 'Content-Type': 'application/json' }) =>
 test('health reports the schema version and request count', async () => {
   const res = await fetch(`${base}/api/health`);
   assert.equal(res.status, 200);
-  assert.deepEqual(await res.json(), { ok: true, schemaVersion: 1, requests: 12 });
+  assert.deepEqual(await res.json(), { ok: true, schemaVersion: 1, requests: 12, allowReset: true });
 });
 
 test('a missing store file is created from the seed', async () => {
@@ -189,4 +189,28 @@ test('check-store reports a good file and fails on a damaged one', async () => {
   const bad = join(dir, 'bad.json');
   await writeFile(bad, JSON.stringify({ ...buildSeedStore(), schemaVersion: 9 }));
   assert.throws(() => execFileSync(process.execPath, [script, bad], { stdio: 'pipe' }), (error) => error.status === 1);
+});
+
+test('FileStore accepts a handover bundle as its file and keeps only the store shape', async () => {
+  const { buildHandover } = await import('../src/domain/export.mjs');
+  const file = join(dir, 'from-bundle.json');
+  await writeFile(file, JSON.stringify(buildHandover(buildSeedStore(), { exportedAt: CLOCK() })));
+  const store = new FileStore(file, { seed: buildSeedStore });
+  await store.open();
+  assert.deepEqual(Object.keys(store.get()).sort(), ['log', 'requests', 'schemaVersion']);
+});
+
+test('reset is refused when the server disables it', async () => {
+  const store = new FileStore(join(dir, 'noreset.json'), { seed: buildSeedStore });
+  await store.open();
+  const locked = createPortalServer({ store, root: ROOT, seed: buildSeedStore, clock: CLOCK, allowReset: false });
+  await new Promise((done) => locked.listen(0, '127.0.0.1', done));
+  const url = `http://127.0.0.1:${locked.address().port}`;
+  try {
+    assert.equal((await (await fetch(`${url}/api/health`)).json()).allowReset, false);
+    const res = await fetch(`${url}/api/reset`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    assert.equal(res.status, 403);
+  } finally {
+    await new Promise((done) => locked.close(done));
+  }
 });
