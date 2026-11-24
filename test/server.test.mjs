@@ -169,3 +169,13 @@ test('a failed update leaves the store and the file unchanged', async () => {
   assert.equal(await readFile(file, 'utf8'), before);
   assert.equal(store.get().requests.length, 12);
 });
+
+test('the app page and its browser files are served', async () => {
+  const index = await fetch(`${base}/`);
+  assert.equal(index.status, 200);
+  assert.match(index.headers.get('content-type'), /text\/html/);
+  assert.match(await index.text(), /src\/ui\/boot\.js/);
+  for (const path of ['/src/ui/app.mjs', '/src/ui/styles.css', '/src/ui/boot.js', '/dist/portal.js', '/favicon.svg']) {
+    assert.equal((await fetch(base + path)).status, 200, path);
+  }
+});
