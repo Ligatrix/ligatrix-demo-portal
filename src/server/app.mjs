@@ -57,7 +57,7 @@ class HttpError extends Error {
 }
 
 function sendJson(res, status, body, extraHeaders = {}) {
-  const payload = JSON.stringify(body, null, 2);
+  const payload = `${JSON.stringify(body, null, 2)}\n`;
   res.writeHead(status, {
     ...SECURITY_HEADERS,
     'Content-Type': 'application/json; charset=utf-8',

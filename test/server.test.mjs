@@ -179,3 +179,14 @@ test('the app page and its browser files are served', async () => {
     assert.equal((await fetch(base + path)).status, 200, path);
   }
 });
+
+test('check-store reports a good file and fails on a damaged one', async () => {
+  const { execFileSync } = await import('node:child_process');
+  const script = join(ROOT, 'scripts', 'check-store.mjs');
+  const good = join(dir, 'good.json');
+  await writeFile(good, JSON.stringify(buildSeedStore()));
+  assert.match(execFileSync(process.execPath, [script, good], { encoding: 'utf8' }), /OK \(store, schema 1, 12 requests, 32 log entries\)/);
+  const bad = join(dir, 'bad.json');
+  await writeFile(bad, JSON.stringify({ ...buildSeedStore(), schemaVersion: 9 }));
+  assert.throws(() => execFileSync(process.execPath, [script, bad], { stdio: 'pipe' }), (error) => error.status === 1);
+});
